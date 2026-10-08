@@ -1,0 +1,703 @@
+<!DOCTYPE html>
+<html lang="pt-BR"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Jarvis</title>
+<meta name="theme-color" content="#0c0c12">
+<link rel="manifest" href="manifest.json">
+<link rel="icon" type="image/png" href="icon192.png">
+<meta name="apple-mobile-web-app-capable" content="yes"><meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-capable" content="yes">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500&display=swap" rel="stylesheet">
+<style>
+:root{box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);--bg:#0c0c12;--fg:#f1ece4;--dim:#8a8a96;--ac:#8b8fd8;--ln:#23232d;--sf:"Fraunces",Georgia,serif}
+html{height:100%;scroll-padding-top:env(safe-area-inset-top,0px)}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+body{margin:0;height:100%;background:var(--bg);color:var(--fg);font-family:system-ui,-apple-system,Roboto,sans-serif;display:flex;flex-direction:column;overflow:hidden}
+button{background:none;border:0;color:inherit;font:inherit;cursor:pointer;padding:0}
+#top{display:flex;align-items:center;justify-content:space-between;padding:14px 18px;color:var(--dim)}
+.sel{position:relative;color:var(--fg)}
+.sel::after{content:"⌄";position:absolute;right:-18px;top:-2px;font-size:20px;color:var(--dim);pointer-events:none}
+#vs{appearance:none;-webkit-appearance:none;background:transparent;border:0;color:var(--fg);font:500 28px var(--sf);text-align:center;outline:none;max-width:60vw}
+#vs option{background:#14141c;font:16px system-ui}
+main{flex:1;min-height:0;display:flex;flex-direction:column;align-items:center;padding:0 22px}
+main[hidden]{display:none}
+#v-j{justify-content:center;text-align:center}
+#core{width:min(74vw,40vh);aspect-ratio:1;cursor:pointer;margin-bottom:18px;flex:none}
+#cv{width:100%;height:100%;display:block}
+#status{font:500 34px/1.15 var(--sf);margin:0 0 10px}
+#j{color:var(--dim);font-size:16px;line-height:1.45;margin:0;max-width:520px;max-height:20vh;overflow-y:auto}
+#u{color:#5d5d6a;font-size:14px;margin:0 0 6px;max-width:520px;min-height:0}
+#act{margin-top:12px}#act a{display:inline-block;border:1px solid var(--ac);color:var(--ac);border-radius:20px;padding:10px 18px;text-decoration:none;font-size:15px}#act[hidden]{display:none}
+#apps{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin-top:14px;max-width:420px}#apps a{color:var(--dim);border:1px solid var(--ln);border-radius:16px;padding:6px 12px;font-size:13px;text-decoration:none}
+#md{margin-top:14px;border:1px solid var(--ln);border-radius:20px;padding:8px 16px;color:var(--dim);font-size:14px}#md.deep{color:var(--ac);border-color:var(--ac)}
+#esc{margin-top:auto;display:flex;gap:10px;align-items:center;color:var(--dim);font-size:17px;padding:14px}
+#row{display:none;width:100%;max-width:520px;gap:8px;padding-bottom:10px}
+#row.show{display:flex}
+#row input,#tf input{flex:1;min-width:0;background:#14141c;border:1px solid var(--ln);color:var(--fg);padding:12px 14px;border-radius:14px;font-size:16px;outline:none}
+#row button,#tf button{background:var(--ac);color:#0c0c12;border-radius:14px;padding:0 16px;font-weight:600}
+.pg{width:100%;max-width:560px;overflow-y:auto;padding-top:6px}
+.pg h2{font:500 30px var(--sf);margin:6px 0 14px}
+.mi{border-bottom:1px solid var(--ln);padding:10px 0}.mi small{color:var(--ac);letter-spacing:2px;font-size:10px}.mi p{margin:3px 0 0;font-size:15px;line-height:1.4;color:#d8d3cb}
+.e{color:var(--dim)}
+#zr{margin:18px 0;color:#c98a8a;border:1px solid #3a2a2e;border-radius:14px;padding:10px 16px}
+#tf{display:flex;gap:8px;margin-bottom:12px}
+.ti{display:flex;align-items:center;gap:12px;padding:12px 0;border-bottom:1px solid var(--ln)}.ti span{flex:1}.ti.d span{color:#5d5d6a;text-decoration:line-through}
+.ti input{accent-color:var(--ac);width:20px;height:20px}.ti button{color:var(--dim);font-size:22px}
+nav{display:flex;border-top:1px solid var(--ln);padding:8px 0 6px}
+nav button{flex:1;display:flex;flex-direction:column;align-items:center;gap:4px;font-size:15px;color:var(--dim);position:relative}
+nav button.a{color:var(--ac)}
+#bd{position:absolute;top:-6px;left:calc(50% + 6px);background:var(--ac);color:#0c0c12;font-size:12px;font-weight:700;min-width:22px;height:22px;border-radius:11px;display:flex;align-items:center;justify-content:center}
+#bd[hidden]{display:none}
+
+#instb{margin-top:12px;border:1px solid var(--ac);color:var(--ac);border-radius:20px;padding:8px 18px;font-size:14px}
+#ovl{position:fixed;inset:0;z-index:80;background:rgba(6,6,10,.74);display:none;align-items:flex-end;justify-content:center}
+#ovl.show{display:flex}
+#ovl .card{background:#14141c;border:1px solid var(--ln);border-radius:22px 22px 0 0;padding:22px 22px 34px;max-width:560px;width:100%;padding-bottom:calc(34px + env(safe-area-inset-bottom,0px))}
+#ovl h3{font:500 24px var(--sf);margin:0 0 12px}
+#ovl p{color:#d8d3cb;font-size:15px;line-height:1.6;margin:0}
+#ovl b.k{color:var(--ac);font-weight:600}
+#ovl .row2{margin-top:16px}
+/* ===== CONFIGURAÇÕES (barra de abas rolável) ===== */
+#cfg{position:fixed;inset:0;z-index:50;background:var(--bg);display:none;flex-direction:column;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+#cfg.show{display:flex}
+#cfg-h{display:flex;align-items:center;justify-content:space-between;padding:18px 22px;border-bottom:1px solid var(--ln)}
+#cfg-h h2{font:500 28px var(--sf);margin:0}
+#cfg-x{border:1px solid #3a3a46;border-radius:22px;padding:11px 22px;font-size:16px;color:var(--fg)}
+#tabs{display:flex;gap:10px;overflow-x:auto;padding:16px 22px 10px;scrollbar-width:none;-webkit-overflow-scrolling:touch;scroll-snap-type:x proximity}
+#tabs::-webkit-scrollbar{display:none}
+#tabs button{flex:none;display:flex;align-items:center;gap:8px;background:#1a1a22;border:1px solid transparent;border-radius:22px;padding:10px 16px;font-size:15px;color:var(--dim);scroll-snap-align:start;white-space:nowrap}
+#tabs button.a{background:#262631;color:var(--fg);border-color:#33333f}
+#tabs button svg{width:18px;height:18px}
+#tbar{height:3px;margin:0 22px 6px;background:#1a1a22;border-radius:2px;position:relative;overflow:hidden}
+#tbar i{position:absolute;left:0;top:0;height:100%;background:#3a3a46;border-radius:2px;width:30%}
+#cfg-b{flex:1;overflow-y:auto;padding:6px 22px 40px}
+.sec{display:none}.sec.a{display:block}
+.sec h3{font:500 24px var(--sf);margin:14px 0 6px;color:var(--fg)}
+.fr{display:flex;align-items:center;justify-content:space-between;gap:14px;padding:18px 0;border-bottom:1px solid var(--ln)}
+.fr .l{flex:1;min-width:0}.fr .l b{display:block;font-weight:500;font-size:17px;color:var(--fg)}
+.fr .l small{display:block;color:var(--dim);font-size:13.5px;line-height:1.4;margin-top:4px}
+.fr input[type=password],.fr input[type=text],.fr input[type=number],.fr select,.fr textarea{background:#14141c;border:1px solid var(--ln);color:var(--fg);padding:12px 14px;border-radius:12px;font-size:15px;outline:none;width:48%;flex:none;font-family:inherit}
+.fr textarea{min-height:90px;resize:vertical}
+.fr.col{flex-direction:column;align-items:stretch}.fr.col input,.fr.col textarea,.fr.col select{width:100%}
+.note{color:#5d5d6a;font-size:13.5px;line-height:1.5;margin:16px 0 0}
+.sw{position:relative;width:50px;height:30px;flex:none}
+.sw input{opacity:0;width:100%;height:100%;position:absolute;margin:0;cursor:pointer;z-index:2}
+.sw span{position:absolute;inset:0;background:#2a2a35;border-radius:15px;transition:.2s}
+.sw span::after{content:"";position:absolute;left:3px;top:3px;width:24px;height:24px;background:#8a8a96;border-radius:50%;transition:.2s}
+.sw input:checked+span{background:var(--ac)}.sw input:checked+span::after{left:23px;background:#0c0c12}
+.btn{background:#1a1a22;border:1px solid var(--ln);border-radius:12px;padding:12px 16px;font-size:15px;color:var(--fg)}
+.btn.ac{background:var(--ac);color:#0c0c12;border-color:var(--ac);font-weight:600}
+.btn.rd{color:#c98a8a;border-color:#3a2a2e}
+.row2{display:flex;gap:10px;flex-wrap:wrap;margin:14px 0}
+.mem-i{display:flex;gap:10px;align-items:flex-start;padding:12px 0;border-bottom:1px solid var(--ln)}
+.mem-i p{flex:1;margin:0;font-size:15px;line-height:1.4;color:#d8d3cb}
+.mem-i small{color:var(--ac);font-size:10px;letter-spacing:1.5px;display:block;margin-bottom:3px}
+.mem-i button{color:var(--dim);font-size:22px;line-height:1}
+.mem-add{display:flex;gap:8px;margin:12px 0}
+.mem-add input{flex:1;background:#14141c;border:1px solid var(--ln);color:var(--fg);padding:12px 14px;border-radius:12px;font-size:15px;outline:none}
+#gal{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-top:12px}
+#gal a{display:block;border:1px solid var(--ln);border-radius:14px;overflow:hidden;background:#14141c}
+#gal img{width:100%;display:block}
+#img-out{margin-top:14px;max-width:520px;width:100%}
+#img-out img{width:100%;border-radius:16px;border:1px solid var(--ln);display:block}
+#img-out .row2{margin:10px 0 0}
+#toast{position:fixed;left:50%;bottom:90px;transform:translateX(-50%);background:#262631;color:var(--fg);border:1px solid #33333f;padding:11px 18px;border-radius:20px;font-size:14px;z-index:99;opacity:0;pointer-events:none;transition:.25s;max-width:86vw;text-align:center}
+#toast.show{opacity:1}
+.tag{display:inline-block;background:#1a1a22;border-radius:10px;padding:3px 9px;font-size:12px;color:var(--ac);margin-left:6px}
+</style></head><body>
+<div id="top"><button id="hist" aria-label="Memória"><svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg></button>
+<span class="sel"><select id="vs" title="Voz"></select></span>
+<button id="gear" aria-label="Chave"><svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/></svg></button></div>
+<main id="v-j"><div id="core"><canvas id="cv"></canvas></div>
+<h1 id="status">Toque para falar.</h1><p id="u"></p><p id="j">Pergunte qualquer coisa.</p>
+<div id="act" hidden></div>
+<div id="apps"><a target="_blank" href="https://www.youtube.com">YouTube</a><a target="_blank" href="https://wa.me/">WhatsApp</a><a target="_blank" href="https://www.instagram.com">Instagram</a><a target="_blank" href="https://www.google.com">Google</a><a target="_blank" href="https://www.google.com/maps">Maps</a><a target="_blank" href="https://open.spotify.com">Spotify</a></div>
+<button id="instb" hidden>Instalar app</button>
+<button id="md"></button>
+<button id="esc"><svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="6" width="20" height="12" rx="3"/><path d="M6 10h.01M10 10h.01M14 10h.01M18 10h.01M7 14h10"/></svg>Escrever</button>
+<form id="row"><input id="q" placeholder="Digite aqui…" autocomplete="off"><button>OK</button></form></main>
+<main id="v-h" hidden><div class="pg"><h2>Hoje</h2><form id="tf"><input id="tq" placeholder="Nova tarefa…" autocomplete="off"><button>+</button></form><div id="tl"></div></div></main>
+<main id="v-m" hidden><div class="pg"><h2>Memória</h2><div id="ml"></div><button id="zr">Apagar memória</button></div></main>
+<nav><button id="t-j" class="a"><svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l8 4.5v9L12 21l-8-4.5v-9z"/><path d="M12 12l8-4.5M12 12v9M12 12L4 7.5"/></svg>Jarvis</button>
+<button id="t-h"><svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4 6h2M4 12h2M4 18h2M10 6h10M10 12h10M10 18h10"/></svg>Hoje<span id="bd" hidden>0</span></button>
+<button id="t-m"><svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4a4 4 0 0 0-4 4 4 4 0 0 0-3 6 4 4 0 0 0 4 5h3z"/><path d="M12 4a4 4 0 0 1 4 4 4 4 0 0 1 3 6 4 4 0 0 1-4 5h-3zM12 4v15"/></svg>Memória</button></nav>
+
+<div id="cfg" role="dialog" aria-label="Configurações">
+ <div id="cfg-h"><h2>Configurações</h2><button id="cfg-x">Fechar</button></div>
+ <div id="tabs"></div><div id="tbar"><i></i></div>
+ <div id="cfg-b">
+
+  <section class="sec" data-t="geral"><h3>Geral</h3>
+   <div class="fr"><div class="l"><b>Instalar como app</b><small id="inst-st">Na tela inicial, abre em tela cheia, sem barra do navegador</small></div><button class="btn ac" id="b-inst">Instalar</button></div>
+   <div class="fr"><div class="l"><b>Tratamento</b><small>Como o Jarvis te chama</small></div><input type="text" id="s-nome" placeholder="senhor"></div>
+   <div class="fr"><div class="l"><b>Saudação ao ligar</b><small>Fala "Online, senhor" ao ativar (gasta 1 chamada de voz)</small></div><label class="sw"><input type="checkbox" id="s-greet"><span></span></label></div>
+   <div class="fr"><div class="l"><b>Ativar ao abrir</b><small>Liga o microfone automaticamente ao abrir o app</small></div><label class="sw"><input type="checkbox" id="s-auto"><span></span></label></div>
+   <div class="fr"><div class="l"><b>Modo profundo</b><small>Pensa mais e responde com mais detalhe (mais lento)</small></div><label class="sw"><input type="checkbox" id="s-deep"><span></span></label></div>
+   <div class="fr col"><div class="l"><b>Personalidade extra</b><small>Instruções que o Jarvis sempre segue</small></div><textarea id="s-pers" placeholder="Ex.: Seja mais bem-humorado. Me lembre de beber água."></textarea></div>
+  </section>
+
+  <section class="sec" data-t="voz"><h3>Voz</h3>
+   <div class="fr"><div class="l"><b>Voz do Jarvis</b><small>Vozes do Gemini TTS</small></div><select id="s-voz"></select></div>
+   <div class="fr"><div class="l"><b>Estilo da fala</b><small>Tom aplicado a todas as respostas</small></div><input type="text" id="s-estilo" placeholder="calmo, grave e confiante"></div>
+   <div class="fr"><div class="l"><b>Modelo de voz</b><small>Lite é o mais rápido</small></div><select id="s-tts"><option value="gemini-3.8-flash-lite-tts">3.8 Flash-Lite (rápido)</option><option value="gemini-3.8-flash-tts">3.8 Flash (qualidade)</option></select></div>
+   <div class="fr"><div class="l"><b>Usar voz do celular se falhar</b><small>Reserva caso o Gemini TTS não responda</small></div><label class="sw"><input type="checkbox" id="s-fb"><span></span></label></div>
+   <div class="row2"><button class="btn ac" id="b-tv">Testar voz</button></div>
+   <p class="note" id="tts-diag"></p>
+  </section>
+
+  <section class="sec" data-t="mic"><h3>Microfone</h3>
+   <div class="fr"><div class="l"><b>Sensibilidade</b><small>Menor número capta falas mais baixas</small></div><input type="number" id="s-sens" min="1" max="10" step="1"></div>
+   <div class="fr"><div class="l"><b>Pausa para terminar de falar (ms)</b><small>Menor = responde mais rápido</small></div><input type="number" id="s-sil" min="200" max="1500" step="50"></div>
+   <div class="fr"><div class="l"><b>Cancelamento de eco / ruído</b><small>Recomendado ligado</small></div><label class="sw"><input type="checkbox" id="s-eco"><span></span></label></div>
+  </section>
+
+  <section class="sec" data-t="apis"><h3>APIs</h3>
+   <div class="fr"><div class="l"><b>Cérebro</b><small>Superagent: inteligência, voz e imagens pelo servidor dele, sem chave no aparelho. Minhas chaves: usa chaves locais.</small></div><select id="s-brain"><option value="super">Superagent · recomendado</option><option value="own">Minhas chaves (local)</option></select></div>
+   <div class="fr"><div class="l"><b>Gemini API Key</b><small>Inteligência principal e geração de imagens (aistudio.google.com/apikey)</small></div><input type="password" id="k-g" autocomplete="off"></div>
+   <div class="fr"><div class="l"><b>Gemini TTS API Key</b><small>Use uma chave do Google AI Studio; a chave principal também funciona</small></div><input type="password" id="k-t" autocomplete="off"></div>
+   <div class="fr"><div class="l"><b>Groq API Key</b><small>Inteligência alternativa e transcrição (console.groq.com/keys)</small></div><input type="password" id="k-q" placeholder="gsk_..." autocomplete="off"></div>
+   <div class="row2"><button class="btn" id="b-tk">Testar chaves</button></div>
+   <p class="note" id="key-diag"></p>
+   <p class="note">Modo Superagent não precisa de chave aqui. As chaves abaixo só valem no modo "Minhas chaves".<br>Chaves ficam só no seu aparelho; a do modo Superagent fica guardada no servidor.</p>
+  </section>
+
+  <section class="sec" data-t="mem"><h3>Memória</h3>
+   <div class="fr"><div class="l"><b>Lembrar do que eu peço</b><small>Salva fatos e pedidos automaticamente</small></div><label class="sw"><input type="checkbox" id="s-mem"><span></span></label></div>
+   <div class="mem-add"><input id="m-new" placeholder="Adicionar uma memória manual…"><button class="btn ac" id="m-add">+</button></div>
+   <div id="m-list"></div>
+   <div class="row2"><button class="btn" id="m-exp">Exportar</button><button class="btn rd" id="m-clr">Apagar tudo</button></div>
+  </section>
+
+  <section class="sec" data-t="notif"><h3>Notificações</h3>
+   <div class="fr"><div class="l"><b>Permitir notificações</b><small id="n-st">Status: verificando…</small></div><button class="btn ac" id="n-perm">Ativar</button></div>
+   <div class="fr"><div class="l"><b>Lembretes por voz</b><small>Diga "me lembra em 10 minutos de..." e o Jarvis avisa</small></div><label class="sw"><input type="checkbox" id="s-lem"><span></span></label></div>
+   <div class="row2"><button class="btn" id="n-test">Enviar teste</button></div>
+   <div id="n-list"></div>
+   <p class="note">Notificações funcionam com o app aberto ou instalado na tela inicial. Em alguns celulares o navegador pausa abas em segundo plano.</p>
+  </section>
+
+  <section class="sec" data-t="img"><h3>Imagens</h3>
+   <div class="fr"><div class="l"><b>Modelo de imagem</b><small>Nano Banana 2 via Gemini</small></div><select id="s-img"><option value="gemini-3.1-flash-image">Nano Banana 2</option><option value="gemini-nano-banana-2.1">Nano Banana 2.1</option><option value="gemini-3.1-flash-lite-image">Nano Banana 2 Lite (rápido)</option></select></div>
+   <div class="fr col"><div class="l"><b>Criar imagem agora</b><small>Ou peça por voz: "crie uma imagem de..."</small></div><input type="text" id="i-p" placeholder="Descreva a imagem…"></div>
+   <div class="row2"><button class="btn ac" id="i-go">Gerar</button></div>
+   <div id="gal"></div>
+  </section>
+
+  <section class="sec" data-t="perf"><h3>Otimização</h3>
+   <div class="fr"><div class="l"><b>Resposta ultrarrápida</b><small>Respostas curtas, sem pesquisa e com o modelo mais veloz</small></div><label class="sw"><input type="checkbox" id="s-fast"><span></span></label></div>
+   <div class="fr"><div class="l"><b>Falar enquanto pensa</b><small>Começa a falar na primeira frase, sem esperar a resposta toda</small></div><label class="sw"><input type="checkbox" id="s-strm"><span></span></label></div>
+   <div class="fr"><div class="l"><b>Pré-aquecer conexões</b><small>Abre a conexão com as APIs ao iniciar</small></div><label class="sw"><input type="checkbox" id="s-warm"><span></span></label></div>
+   <div class="fr"><div class="l"><b>Histórico enviado à IA</b><small>Menos mensagens = mais rápido</small></div><input type="number" id="s-hist" min="2" max="40" step="2"></div>
+   <div class="fr"><div class="l"><b>Pesquisa na web</b><small>Usa Google Search quando a pergunta pede dados atuais</small></div><label class="sw"><input type="checkbox" id="s-web"><span></span></label></div>
+   <p class="note" id="perf-diag"></p>
+  </section>
+
+  <section class="sec" data-t="priv"><h3>Privacidade</h3>
+   <div class="fr"><div class="l"><b>Salvar histórico no aparelho</b><small>Guarda as conversas localmente</small></div><label class="sw"><input type="checkbox" id="s-sh"><span></span></label></div>
+   <div class="row2"><button class="btn rd" id="p-hist">Apagar histórico</button><button class="btn rd" id="p-all">Apagar tudo (chaves, memória, tarefas)</button></div>
+   <p class="note">Nada é enviado a servidores do Jarvis. Seus dados ficam no aparelho; apenas o texto/áudio da conversa vai direto para Google/Groq usando suas chaves.</p>
+  </section>
+
+ </div>
+</div>
+<div id="ovl"><div class="card"><h3>Instalar o Jarvis</h3><p id="ovl-p"></p><div class="row2"><button class="btn ac" id="ovl-ok" hidden>Instalar agora</button><button class="btn" id="ovl-x">Fechar</button></div></div></div>
+<div id="toast"></div>
+<script>
+const $=id=>document.getElementById(id),st=$('status'),B=document.body;
+/* =====================================================================
+   JARVIS v6 — motor novo: configurações, voz em streaming, memória,
+   notificações e imagens (Nano Banana). Tudo em localStorage.
+   ===================================================================== */
+const DEF={brain:'super',greet:true,nome:'senhor',auto:true,deep:false,pers:'',voz:'Charon',estilo:'calmo, grave e confiante',tts:'gemini-3.8-flash-lite-tts',fb:true,
+ sens:3,sil:380,eco:true,mem:true,lem:true,img:'gemini-3.1-flash-image',fast:true,strm:true,warm:true,hist:10,web:true,sh:true};
+let S={};try{S=Object.assign({},DEF,JSON.parse(localStorage.getItem('jcfg')||'{}'))}catch(e){S=Object.assign({},DEF)}
+function saveS(){try{localStorage.setItem('jcfg',JSON.stringify(S))}catch(e){}}
+function toast(t,ms){const x=$('toast');x.textContent=t;x.classList.add('show');clearTimeout(toast._t);toast._t=setTimeout(()=>x.classList.remove('show'),ms||2600)}
+const lsGet=(k,d)=>{try{const v=localStorage.getItem(k);return v==null?d:v}catch(e){return d}};
+const lsSet=(k,v)=>{try{localStorage.setItem(k,v)}catch(e){}};
+const jget=(k,d)=>{try{return JSON.parse(lsGet(k,''))||d}catch(e){return d}};
+
+/* ---------- Chaves (Gemini, TTS, Groq) ---------- */
+const getK=()=>lsGet('jk','');          // Gemini principal
+const getT=()=>lsGet('jkt','')||getK(); // TTS (cai para a principal)
+const getG=()=>lsGet('jg','');          // Groq
+const GU='https://generativelanguage.googleapis.com/v1beta/models/';
+const GQ='https://api.groq.com/openai/v1/';
+const SITE_OK=false; // true quando o Jarvis estiver hospedado em um endereço https
+const BRAIN='https://superagent-2b521f2b.base44.app/functions/jarvisBrain';
+const PASS='jrv_b55595218338d67b8cf1a5362ae7c903';
+const hasBrain=()=>S.brain!=='own';
+let brainOK=null;
+async function gSend(path,body,opts){
+ if(hasBrain()){
+  const r=await fetch(BRAIN,{method:'POST',signal:opts&&opts.signal,headers:{'content-type':'application/json'},body:JSON.stringify({pc:PASS,path,body})});
+  if(!r.ok&&r.status===403)brainOK=false;else if(r.ok)brainOK=true;
+  return r}
+ return fetch(GU+path,{method:'POST',signal:opts&&opts.signal,headers:{'content-type':'application/json','x-goog-api-key':getK()},body:JSON.stringify(body)})}
+
+/* ---------- Memória de longo prazo (fatos) ---------- */
+let facts=jget('jf',[]);                 // [{id,t,d}]
+const saveF=()=>lsSet('jf',JSON.stringify(facts));
+function addFact(t,silent){t=(t||'').trim().slice(0,300);if(!t)return;
+ if(facts.some(f=>f.t.toLowerCase()===t.toLowerCase()))return;
+ facts.unshift({id:Date.now()+Math.random(),t,d:new Date().toISOString()});facts=facts.slice(0,150);saveF();if(!silent)toast('Memorizado: '+t)}
+const factsTxt=()=>facts.length?(' MEMÓRIA DE LONGO PRAZO sobre o usuário (use quando relevante): '+facts.slice(0,40).map(f=>f.t).join('; ')+'.'):'';
+
+/* ---------- Prompt do sistema ---------- */
+const SYS1=`Você é J.A.R.V.I.S., assistente pessoal de IA: culto, preciso, educado e levemente espirituoso. Trate o usuário por '%N'. Ele fala de modo bem informal, com gírias, hesitações e frases incompletas: entenda a intenção real e responda no mesmo tom descontraído. Responda sempre em português do Brasil, em texto puro sem markdown, listas ou símbolos, pois sua resposta é falada em voz alta. Use o histórico e a memória. Se não tiver certeza, diga. Você não lê mensagens, fotos nem contas do celular, mas pode abrir apps, salvar memórias, criar lembretes e criar imagens.
+AÇÕES: sempre que for útil, termine a resposta com || e UM código de ação. Códigos: yt:busca, g:busca, wa:número só dígitos com DDI|texto, ig:usuario, maps:lugar, tel:numero, sp:busca, mem:fato curto a lembrar (use quando o usuário pedir para lembrar/salvar/anotar algo ou disser um fato pessoal importante, escrito na terceira pessoa, ex.: 'O usuário gosta de café sem açúcar'), lem:minutos|texto do lembrete (ex.: lem:10|tomar remédio; minutos é um número), img:descrição detalhada em inglês da imagem (quando pedir para criar/gerar/desenhar uma imagem), tarefa:texto (adicionar à lista Hoje). Exemplo: 'Anotado. || mem:O usuário tem um cachorro chamado Thor'. Sem pedido, não inclua ação.`;
+const sysP=()=>SYS1.replace('%N',S.nome||'senhor')+factsTxt()+(S.pers?' Instruções do usuário: '+S.pers:'')+
+ (S.deep?' Pense com cuidado. Seja correto e completo, mas direto: até 3 frases curtas.':' Responda em NO MÁXIMO 1 frase curta de até 14 palavras, direta.');
+const deepOn=()=>S.deep&&!S.fast;
+
+let mute=0,on=false,busy=false,speaking=false,hist=[],rec=null,stream=null,ac=null,curSrc=null,abortCtl=null,bargeOK=true;
+if(S.sh)hist=jget('jh',[]);
+const saveH=()=>{if(S.sh)lsSet('jh',JSON.stringify(hist))};
+const SR=window.SpeechRecognition||window.webkitSpeechRecognition;
+
+/* ---------- Voz do aparelho (reserva) ---------- */
+let voice=null;
+function pick(){if(!('speechSynthesis' in window))return;const v=speechSynthesis.getVoices().filter(x=>/pt[-_]/i.test(x.lang));
+ const rank=x=>{const n=x.name.toLowerCase();let p=0;if(/natural|online|neural/.test(n))p+=4;if(/antonio|daniel|felipe|ricardo|google/.test(n))p+=3;if(/luciana|maria|francisca|fernanda|female|fem/.test(n))p-=5;return p};
+ voice=v.sort((a,b)=>rank(b)-rank(a))[0]||null}
+if('speechSynthesis' in window){pick();speechSynthesis.onvoiceschanged=pick}
+const SM={'OUVINDO':'Ouvindo…','PROCESSANDO':'Pensando…','FALANDO':'Falando…','ATIVANDO…':'Ligando…','TOQUE NO NÚCLEO PARA ATIVAR':'Toque para falar.','ATIVO':'Ouvindo…'};
+function setS(t){st.textContent=SM[t]||(t.charAt(0)+t.slice(1).toLowerCase())}
+function dspeak(t){return new Promise(r=>{if(!('speechSynthesis' in window))return r();try{speechSynthesis.cancel()}catch(e){}
+ const u=new SpeechSynthesisUtterance(t);u.lang='pt-BR';if(voice)u.voice=voice;u.rate=1.05;
+ u.onstart=()=>{speaking=true;B.classList.add('talk');setS('FALANDO')};
+ u.onend=()=>{speaking=false;B.classList.remove('talk');r()};
+ u.onerror=()=>{speaking=false;B.classList.remove('talk');r()};
+ speechSynthesis.speak(u)})}
+
+/* ---------- Gemini TTS (corrigido) ----------
+   BUG ANTIGO: usava gemini-3.1-flash-tts-preview (sendo desligado) e esperava
+   o áudio inteiro. Agora: modelo 3.8, formato certo, estilo na instrução,
+   PCM 24kHz com cache + reuso de conexão e fallback automático entre modelos. */
+let ttsErr='',ttsOKcount=0;
+const ttsCache=new Map();
+function b64pcm(b){const x=atob(b),n=x.length>>1,f=new Float32Array(n);for(let i=0;i<n;i++){let v=x.charCodeAt(2*i)|(x.charCodeAt(2*i+1)<<8);if(v>=32768)v-=65536;f[i]=v/32768}return f}
+function wavToF32(b64){ // aceita WAV (com cabeçalho) ou PCM cru
+ const x=atob(b64),u=new Uint8Array(x.length);for(let i=0;i<x.length;i++)u[i]=x.charCodeAt(i);
+ let off=0,rate=24000;
+ if(u[0]===0x52&&u[1]===0x49&&u[2]===0x46&&u[3]===0x46){ // RIFF
+  const dv=new DataView(u.buffer);rate=dv.getUint32(24,true)||24000;off=12;
+  while(off<u.length-8){const id=String.fromCharCode(u[off],u[off+1],u[off+2],u[off+3]),sz=dv.getUint32(off+4,true);if(id==='data'){off+=8;break}off+=8+sz}}
+ const n=(u.length-off)>>1,f=new Float32Array(n),dv=new DataView(u.buffer);
+ for(let i=0;i<n;i++)f[i]=dv.getInt16(off+2*i,true)/32768;
+ return{f,rate}}
+function ttsModels(){const m=[lsGet('jttsM',''),S.tts,'gemini-3.8-flash-lite-tts','gemini-3.8-flash-tts','gemini-2.5-flash-preview-tts'];return[...new Set(m.filter(Boolean))]}
+async function ttsBuf(t){
+ if(!ac||!(getT()||hasBrain()))return null;
+ const ck=S.voz+'|'+S.estilo+'|'+t;if(ttsCache.has(ck))return ttsCache.get(ck);
+ const style=(S.estilo||'').trim();
+ for(const m of ttsModels()){
+  const is38=m.indexOf('3.8')>=0;
+  const prompt=is38?t:((style?'Fale em português do Brasil, '+style+': ':'Fale em português do Brasil: ')+t);
+  const body={contents:[{role:'user',parts:[{text:prompt}]}],generationConfig:{responseModalities:['AUDIO'],speechConfig:{voiceConfig:{prebuiltVoiceConfig:{voiceName:S.voz}}}}};
+  if(is38&&style)body.systemInstruction={parts:[{text:'Estilo de fala: '+style+'. Idioma: português do Brasil.'}]};
+  try{
+   const r=await gSend(m+':generateContent',body);
+   if(r.status===429){ttsErr=m+' → limite da API (aguarde um minuto)';break}
+   if(!r.ok){let d={};try{d=await r.json()}catch(e){}ttsErr=m+' → '+r.status+(d.error&&d.error.message?' '+d.error.message.slice(0,90):'');
+    if(r.status===400&&is38&&body.systemInstruction){delete body.systemInstruction;body.contents[0].parts[0].text=(style?style+': ':'')+t;
+     const r2=await gSend(m+':generateContent',body);
+     if(r2.ok){const d2=await r2.json();const p2=((d2.candidates||[])[0]?.content?.parts||[]).find(x=>x.inlineData);if(p2){const o=wavToF32(p2.inlineData.data),b=ac.createBuffer(1,o.f.length,o.rate);b.copyToChannel(o.f,0);ttsErr='';ttsOKcount++;ttsCache.set(ck,b);return b}}}
+    if(r.status===403||r.status===401)break; continue}
+   const d=await r.json();const p=((d.candidates||[])[0]?.content?.parts||[]).find(x=>x.inlineData);
+   if(!p){ttsErr=m+' → sem áudio';continue}
+   const o=wavToF32(p.inlineData.data),b=ac.createBuffer(1,o.f.length,o.rate);b.copyToChannel(o.f,0);
+   ttsErr='';ttsOKcount++;lsSet('jttsM',m);if(ttsCache.size>40)ttsCache.delete(ttsCache.keys().next().value);ttsCache.set(ck,b);return b;
+  }catch(e){ttsErr=m+' → rede ('+(e.message||e)+')'}}
+ return null}
+function stopAudio(){try{curSrc&&curSrc.stop()}catch(e){}curSrc=null;try{speechSynthesis.cancel()}catch(e){}}
+async function playBuf(buf){
+ try{await ac.resume()}catch(e){}
+ await new Promise(res=>{const o=ac.createBufferSource();o.buffer=buf;o.connect(ac.destination);curSrc=o;o.onended=()=>{if(curSrc===o)curSrc=null;res()};speaking=true;B.classList.add('talk');setS('FALANDO');o.start()});
+ speaking=false;B.classList.remove('talk')}
+const useG=()=>S.voz!=='device'&&!!ac&&(hasBrain()||!!getT());
+async function speak(t){
+ if(useG()){const b=await ttsBuf(t);if(b){await playBuf(b);return}
+  if(!S.fb){$('j').textContent=t+'  ⚠ voz: '+ttsErr;return}}
+ return dspeak(t)}
+
+/* Fila de reprodução: sintetiza frases em paralelo e toca em ordem */
+function makePlayer(){
+ const q=[];let wake=null,closed=false,shown='',cancelled=false;
+ const done=(async()=>{let i=0;
+  for(;;){
+   while(i>=q.length){if(closed||cancelled)return;await new Promise(r=>wake=r)}
+   if(cancelled)return;
+   const it=q[i++];const buf=await it.p;
+   shown+=(shown?' ':'')+it.text;$('j').textContent=shown;
+   if(!on||cancelled)continue;
+   if(buf)await playBuf(buf);
+   else{if(useG()&&ttsErr)$('j').title=ttsErr;if(S.fb||!useG())await dspeak(it.text)}}})();
+ const nudge=()=>{if(wake){const w=wake;wake=null;w()}};
+ return{add(text){if(!text.trim())return;q.push({text,p:on&&useG()?ttsBuf(text):Promise.resolve(null)});nudge()},end(){closed=true;nudge()},cancel(){cancelled=true;stopAudio();nudge()},done}}
+
+/* ---------- Reconhecimento por texto (reserva) ---------- */
+function listen(){
+ if(!on||busy||speaking||rec||!SR)return;
+ rec=new SR();rec.lang='pt-BR';rec.continuous=false;rec.interimResults=false;
+ rec.onstart=()=>{B.classList.add('listen');setS('OUVINDO')};
+ rec.onresult=e=>{handle({text:e.results[e.results.length-1][0].transcript})};
+ rec.onerror=e=>{if(e.error==='not-allowed'||e.error==='service-not-allowed'){setS('MICROFONE BLOQUEADO');on=false;B.classList.remove('on')}};
+ rec.onend=()=>{rec=null;B.classList.remove('listen');if(on&&!busy&&!speaking)setTimeout(listen,250)};
+ try{rec.start()}catch(e){rec=null}}
+
+/* ---------- Ações ---------- */
+const clean=t=>t.replace(/[*_`#]/g,'');
+function split(full){const p=full.split('||');if(p.length<2)return{ans:full.replace(/\|$/,'')};return{ans:p[0].replace(/\|$/,'').trim(),act:(p[1]||'').replace(/\|$/,'').trim(),done:true}}
+function actUrl(a){const i=a.indexOf(':');if(i<0)return null;const k=a.slice(0,i).trim().toLowerCase(),v=a.slice(i+1).trim(),e=encodeURIComponent;
+ if(k==='yt')return['YouTube: '+v,'https://www.youtube.com/results?search_query='+e(v)];
+ if(k==='g')return['Google: '+v,'https://www.google.com/search?q='+e(v)];
+ if(k==='wa'){const q=v.includes('|')?v.split('|'):['',v],n=(q[0]||'').replace(/\D/g,'');return['WhatsApp'+(n?' '+n:''),'https://wa.me/'+n+'?text='+e((q.slice(1).join('|')||'').trim())]}
+ if(k==='ig'){const u=v.replace('@','');return['Instagram: @'+u,'https://www.instagram.com/'+e(u)+'/']}
+ if(k==='maps')return['Maps: '+v,'https://www.google.com/maps/search/?api=1&query='+e(v)];
+ if(k==='tel')return['Ligar: '+v,'tel:'+v.replace(/[^\d+]/g,'')];
+ if(k==='sp')return['Spotify: '+v,'https://open.spotify.com/search/'+e(v)];
+ return null}
+function doAct(a){
+ const i=a.indexOf(':'),k=(i<0?a:a.slice(0,i)).trim().toLowerCase(),v=i<0?'':a.slice(i+1).trim();
+ if(k==='mem'){if(S.mem)addFact(v);return}
+ if(k==='lem'){if(S.lem){const m=v.split('|'),min=parseFloat(m[0]);addReminder(isNaN(min)?5:min,(m.slice(1).join('|')||'Lembrete').trim())}return}
+ if(k==='img'){genImage(v);return}
+ if(k==='tarefa'){td.push({t:v,d:false});sv();todos();toast('Tarefa adicionada');return}
+ const r=actUrl(a);if(!r)return;const c=$('act');c.innerHTML='';const l=document.createElement('a');l.href=r[1];l.target='_blank';l.rel='noopener';l.textContent='Abrir · '+r[0];c.appendChild(l);c.hidden=false;try{window.open(r[1],'_blank','noopener')}catch(e){}}
+
+/* ---------- Cérebro: Gemini (streaming) ---------- */
+const NEEDS=/hoje|agora|atual|recente|últim|noticia|notícia|preço|cotaç|clima|previs|resultado|placar|quem é o|presidente|2026|semana|ontem|amanhã|temperatura/i;
+function chatModels(needS){
+ if(deepOn())return['gemini-3.8-flash','gemini-3.6-flash','gemini-2.5-flash'];
+ if(needS&&S.web)return['gemini-3.8-flash','gemini-3.5-flash-lite','gemini-2.5-flash'];
+ return['gemini-3.5-flash-lite','gemini-3.1-flash-lite','gemini-2.5-flash-lite','gemini-2.5-flash']}
+function streamParse(rd,player,onTxt){
+ return(async()=>{const dec=new TextDecoder();let buf='',full='',first=0;
+  for(;;){const{value,done}=await rd.read();if(done)break;buf+=dec.decode(value,{stream:true});let ix;
+   while((ix=buf.indexOf('\n'))>=0){const ln=buf.slice(0,ix).trim();buf=buf.slice(ix+1);if(!ln.startsWith('data:')||ln.includes('[DONE]'))continue;
+    try{const t=onTxt(JSON.parse(ln.slice(5)));if(t){full+=t;const sp=split(full);
+     if(S.strm&&!first){const c=clean(sp.ans);
+      if(sp.done&&c.trim()){player.add(c.trim());first=c.trim().length}
+      else{const mm=c.match(/^([\s\S]{6,}?[.!?;:])\s/)||c.match(/^([\s\S]{28,}?,)\s/);if(mm){player.add(mm[1]);first=mm[0].length}}}
+     else if(S.strm&&first&&sp.ans&&full.length%1===0){ // frases seguintes, assim que fecham
+      const c=clean(sp.ans);const rest=c.slice(first);const mm=rest.match(/^([\s\S]{6,}?[.!?;:])\s/);if(mm&&!sp.done){player.add(mm[1].trim());first+=mm[0].length}}}}catch(e){}}}
+  const sp=split(full),c=clean(sp.ans).trim();
+  return{full,c,act:sp.act,first}})()}
+async function viaGemini(player,text,ctl){
+ if(!getK()&&!hasBrain())throw{code:'sem_chave',message:'Ative o cérebro Superagent ou adicione uma chave em Configurações > APIs'};
+ const m=hist.slice(-(S.hist||10));while(m.length&&m[0].role!=='user')m.shift();
+ const contents=[...m.map(x=>({role:x.role==='user'?'user':'model',parts:[{text:x.content}]})),{role:'user',parts:[{text:text+'\n(Formato: resposta || ação — a ação só se fizer sentido.)'}]}];
+ const needS=S.web&&!S.fast&&NEEDS.test(text)||S.web&&NEEDS.test(text)&&/clima|previs|placar|cotaç|notícia|noticia|preço/i.test(text);
+ let last={code:'?'};
+ for(const[i,model]of chatModels(needS).entries()){
+  for(let a=0;a<2;a++){
+   const gc={maxOutputTokens:deepOn()?1500:200,temperature:.7};
+   if(/3\.\d/.test(model))gc.thinkingConfig={thinkingLevel:deepOn()?'low':'minimal'};else if(model.includes('2.5-flash'))gc.thinkingConfig={thinkingBudget:deepOn()?512:0};
+   const body={systemInstruction:{parts:[{text:sysP()}]},contents,generationConfig:gc};
+   if(needS&&i===0)body.tools=[{google_search:{}}];
+   let r;try{r=await gSend(model+':streamGenerateContent?alt=sse',body,{signal:ctl.signal})}
+   catch(e){if(e.name==='AbortError')throw{code:'abort'};last={code:'rede',message:String(e)};break}
+   if(r.ok){
+    const res=await streamParse(r.body.getReader(),player,j=>((j.candidates||[])[0]?.content?.parts||[]).map(p=>p.thought?'':(p.text||'')).join(''));
+    if(!res.c){last={code:'vazio'};break}
+    if(res.first)player.add(res.c.slice(res.first).trim());else player.add(res.c);
+    return{ans:res.c,act:res.act}}
+   let d={};try{d=await r.json()}catch(e){}
+   last={code:r.status,message:(d.error&&d.error.message)||''};
+   if(r.status===403||r.status===401||(r.status===400&&/API key/i.test(last.message)))throw last;
+   if(r.status===503||r.status===429||r.status===500){if(a===0){await new Promise(z=>setTimeout(z,250));continue}break}
+   break}}
+ throw last}
+
+/* ---------- Cérebro: Groq (streaming) + transcrição ---------- */
+function wavBlob(b){const x=atob(b),u=new Uint8Array(x.length);for(let i=0;i<x.length;i++)u[i]=x.charCodeAt(i);return new Blob([u],{type:'audio/wav'})}
+async function groqSTT(b64){
+ const f=new FormData();f.append('file',wavBlob(b64),'a.wav');f.append('model','whisper-large-v3-turbo');f.append('language','pt');f.append('response_format','json');f.append('temperature','0');
+ let r;try{r=await fetch(GQ+'audio/transcriptions',{method:'POST',headers:{Authorization:'Bearer '+getG()},body:f})}catch(e){throw{code:'rede',message:String(e)}}
+ if(!r.ok){const d=await r.json().catch(()=>({}));throw{code:r.status,message:(d.error&&d.error.message)||''}}
+ return((await r.json()).text||'').trim()}
+async function geminiSTT(b64){
+ if(!getK()&&!hasBrain())throw{code:'sem_chave'};const body={contents:[{role:'user',parts:[{inlineData:{mimeType:'audio/wav',data:b64}},{text:'Transcreva literalmente a fala em português do Brasil. Responda SOMENTE com a transcrição. Se não houver fala compreensível, responda apenas: .'}]}],generationConfig:{maxOutputTokens:120,temperature:0,thinkingConfig:{thinkingLevel:'minimal'}}};
+ for(const m of['gemini-3.5-flash-lite','gemini-3.1-flash-lite','gemini-2.5-flash-lite']){
+  try{const r=await gSend(m+':generateContent',body);
+   if(!r.ok)continue
+   const d=await r.json();const t=((d.candidates||[])[0]?.content?.parts||[]).map(p=>p.text||'').join('').trim();return t==='.'?'':t}catch(e){}}
+ throw{code:'stt',message:'não consegui transcrever'}}
+async function groqChat(player,text,ctl){
+ const m=hist.slice(-(S.hist||10));while(m.length&&m[0].role!=='user')m.shift();
+ const msgs=[{role:'system',content:sysP()},...m.map(x=>({role:x.role,content:x.content})),{role:'user',content:text+'\n(Formato: resposta || ação — a ação só se fizer sentido.)'}];
+ const ML=deepOn()?['llama-3.3-70b-versatile','openai/gpt-oss-120b']:['llama-3.1-8b-instant','llama-3.3-70b-versatile'];
+ let last={code:'?'};
+ for(const model of ML){for(let a=0;a<2;a++){
+  let r;try{r=await fetch(GQ+'chat/completions',{method:'POST',signal:ctl.signal,headers:{'content-type':'application/json',Authorization:'Bearer '+getG()},body:JSON.stringify({model,messages:msgs,stream:true,max_tokens:deepOn()?600:120,temperature:.6})})}
+  catch(e){if(e.name==='AbortError')throw{code:'abort'};throw{code:'rede',message:String(e)}}
+  if(r.ok){const res=await streamParse(r.body.getReader(),player,j=>(j.choices&&j.choices[0]&&j.choices[0].delta&&j.choices[0].delta.content)||'');
+   if(!res.c){last={code:'vazio'};break}
+   if(res.first)player.add(res.c.slice(res.first).trim());else player.add(res.c);
+   return{ans:res.c,act:res.act}}
+  let d={};try{d=await r.json()}catch(e){}
+  last={code:r.status,message:(d.error&&d.error.message)||''};
+  if(r.status===401)throw last;if(r.status===429)throw last;
+  if(r.status>=500&&a===0){await new Promise(z=>setTimeout(z,250));continue}break}}
+ throw last}
+
+/* ---------- Fluxo principal ---------- */
+async function handle(inp){
+ const isA=!!inp.wav;if(!isA&&!(inp.text||'').trim())return;
+ if(busy)return;
+ busy=true;stopAudio();const t0=performance.now();
+ $('u').textContent=isA?'…':inp.text;if(!isA)$('j').textContent='…';setS('PROCESSANDO');B.classList.remove('listen');$('act').hidden=true;
+ const player=makePlayer();let out='',ut=isA?'':inp.text,fail=false,act='';
+ const ctl=new AbortController();abortCtl=ctl;
+ try{
+  let t=inp.text;
+  if(isA){ // transcrição: Groq (mais rápido) → Gemini
+   if(getG()){try{t=await groqSTT(inp.wav)}catch(e){if(!getK()&&!hasBrain())throw e;t=await geminiSTT(inp.wav)}}
+   else if(getK()||hasBrain())t=await geminiSTT(inp.wav);
+   else throw{code:'sem_chave',message:'Ative o cérebro Superagent ou adicione uma chave em Configurações > APIs'};
+   if(!t||t.length<2||/amara\.org|legendas pela|obrigad[oa] por assistir/i.test(t)){$('u').textContent='—';out='';throw{code:'skip'}}
+   $('u').textContent=t}
+  ut=t;
+  let done=false;
+  const preferG=getG()&&!(deepOn()||(S.web&&NEEDS.test(t)&&(getK()||hasBrain())));
+  const tryG=async()=>{const res=await groqChat(player,t,ctl);out=res.ans;act=res.act||'';done=true};
+  const tryM=async()=>{const res=await viaGemini(player,t,ctl);out=res.ans;act=res.act||'';done=true};
+  if(preferG){try{await tryG()}catch(e){if(e.code==='abort'||(!getK()&&!hasBrain()))throw e;await tryM()}}
+  else{ if(getK()||hasBrain()){try{await tryM()}catch(e){if(e.code==='abort'||!getG())throw e;await tryG()}} else await tryG() }
+ }catch(e){
+  if(e.code==='skip'){player.cancel()}
+  else if(e.code==='abort'){player.cancel()}
+  else{fail=true;out=e.code==='sem_chave'?(e.message||'Falta a chave, senhor.'):'Falha nos meus sistemas, senhor. Código: '+(e.code||'?')+(e.message?' - '+String(e.message).slice(0,80):'');player.add(out)}}
+ if(!fail&&act)doAct(act);
+ if(!fail&&out){hist.push({role:'user',content:ut||'(áudio)'},{role:'assistant',content:out});hist=hist.slice(-60);saveH()}
+ player.end();await player.done;abortCtl=null;
+ $('perf-diag').textContent='Última resposta: '+Math.round(performance.now()-t0)+' ms (do fim da sua fala até o fim da resposta).';
+ mute=Date.now()+350;busy=false;setS(on?(micOk?'OUVINDO':'USE O CAMPO DE TEXTO'):'TOQUE NO NÚCLEO PARA ATIVAR')}
+
+/* ---------- Microfone com detecção de voz ---------- */
+let locked=false,micOk=false,proc=null,msrc=null,zero=null,ring=[],recBuf=null,lastV=0,vStart=0,nf=.01;
+function toWav(ch){let n=0;ch.forEach(c=>n+=c.length);const all=new Float32Array(n);let o=0;ch.forEach(c=>{all.set(c,o);o+=c.length});
+ const ratio=ac.sampleRate/16000,m=Math.floor(n/ratio),p=new Int16Array(m);
+ for(let i=0;i<m;i++){const a=Math.floor(i*ratio),b=Math.max(a+1,Math.floor((i+1)*ratio));let v=0;for(let j=a;j<b;j++)v+=all[j];v/=(b-a);p[i]=Math.max(-1,Math.min(1,v))*32767}
+ const buf=new ArrayBuffer(44+m*2),dv=new DataView(buf),w=(q,t)=>{for(let i=0;i<t.length;i++)dv.setUint8(q+i,t.charCodeAt(i))};
+ w(0,'RIFF');dv.setUint32(4,36+m*2,true);w(8,'WAVEfmt ');dv.setUint32(16,16,true);dv.setUint16(20,1,true);dv.setUint16(22,1,true);dv.setUint32(24,16000,true);dv.setUint32(28,32000,true);dv.setUint16(32,2,true);dv.setUint16(34,16,true);w(36,'data');dv.setUint32(40,m*2,true);new Int16Array(buf,44).set(p);
+ const u=new Uint8Array(buf);let bin='';for(let i=0;i<u.length;i+=0x8000)bin+=String.fromCharCode.apply(null,u.subarray(i,i+0x8000));return btoa(bin)}
+async function startMic(){
+ if(micOk)return;
+ stream=await navigator.mediaDevices.getUserMedia({audio:{echoCancellation:!!S.eco,noiseSuppression:!!S.eco,autoGainControl:true}});
+ msrc=ac.createMediaStreamSource(stream);proc=ac.createScriptProcessor(2048,1,1);zero=ac.createGain();zero.gain.value=0;
+ msrc.connect(proc);proc.connect(zero);zero.connect(ac.destination);micOk=true;
+ proc.onaudioprocess=e=>{
+  const x=e.inputBuffer.getChannelData(0);let sum=0;for(let i=0;i<x.length;i++)sum+=x[i]*x[i];
+  const rms=Math.sqrt(sum/x.length),now=Date.now();
+  if(!on||busy||speaking||now<mute){recBuf=null;ring=[];return}
+  const thr=Math.max(.012+S.sens*.003,nf*3.2),cp=new Float32Array(x);
+  if(!recBuf){nf=nf*.97+rms*.03;ring.push(cp);if(ring.length>5)ring.shift();
+   if(rms>thr){recBuf=ring.slice();ring=[];lastV=now;vStart=now;B.classList.add('listen')}return}
+  recBuf.push(cp);if(rms>thr)lastV=now;
+  if(now-lastV>(S.sil||380)||now-vStart>15000){const b=recBuf;recBuf=null;B.classList.remove('listen');if(lastV-vStart>180)handle({wav:toWav(b)})}}}
+function stopMic(){micOk=false;recBuf=null;try{proc&&proc.disconnect();msrc&&msrc.disconnect()}catch(e){}proc=null;if(stream){stream.getTracks().forEach(t=>t.stop());stream=null}}
+function warm(){
+ if(!S.warm)return;
+ if(hasBrain()){
+  fetch(BRAIN,{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({pc:PASS,path:'ping'})}).then(async r=>{try{const d=await r.json();brainOK=!!(d.ok&&d.key)}catch(e){brainOK=false}}).catch(()=>{brainOK=false});
+  return}
+ const gk=getG();if(gk)fetch(GQ+'models',{headers:{Authorization:'Bearer '+gk}}).catch(()=>{});
+ const kk=getK();if(kk)fetch(GU+'gemini-3.5-flash-lite',{headers:{'x-goog-api-key':kk}}).catch(()=>{});
+ const tk=getT();if(tk&&useG()&&!ttsCache.size)ttsBuf('Online, '+(S.nome||'senhor')+'.').catch(()=>{})}
+async function start(){
+ on=true;B.classList.add('on');setS('ATIVANDO…');
+ if(!ac){try{ac=new(window.AudioContext||window.webkitAudioContext)({latencyHint:'interactive'})}catch(e){}}
+ try{ac&&await ac.resume()}catch(e){}
+ if(!getK()&&!getG()&&!hasBrain()){setS('ADICIONE SUA CHAVE EM CONFIGURAÇÕES');openCfg('apis')}
+ warm();
+ try{await startMic()}catch(e){micOk=false;setS('MICROFONE BLOQUEADO - USE O CAMPO DE TEXTO')}
+ busy=true;
+ if(ac&&ac.state!=='running'){locked=true;setS('TOQUE NA TELA PARA ATIVAR A VOZ');await new Promise(r=>{const f=()=>{document.removeEventListener('pointerdown',f);try{ac.resume()}catch(e){}setTimeout(()=>{locked=false},400);r()};document.addEventListener('pointerdown',f)})}
+ if(!on){busy=false;return}
+ if(S.greet!==false){const g='Online, '+(S.nome||'senhor')+'.';$('j').textContent=g;await speak(g)}
+ mute=Date.now()+300;busy=false;if(on)setS(micOk?'OUVINDO':'USE O CAMPO DE TEXTO')}
+function stop(){
+ on=false;B.classList.remove('on','listen','talk');if(abortCtl)try{abortCtl.abort()}catch(e){}stopAudio();stopMic();
+ setS('TOQUE NO NÚCLEO PARA ATIVAR')}
+
+/* ---------- Notificações e lembretes ---------- */
+let rems=jget('jr',[]);const saveR=()=>lsSet('jr',JSON.stringify(rems));
+function notifStatus(){const el=$('n-st');if(!('Notification' in window)){el.textContent='Status: seu navegador não suporta notificações';return}
+ el.textContent='Status: '+({granted:'permitido ✓',denied:'bloqueado (libere nas configurações do navegador)',default:'ainda não permitido'}[Notification.permission])}
+async function askNotif(){if(!('Notification' in window)){toast('Navegador sem suporte');return false}
+ let p=Notification.permission;if(p==='default')p=await Notification.requestPermission();notifStatus();return p==='granted'}
+async function notify(title,body){
+ try{ if('Notification' in window&&Notification.permission==='granted'){
+   const reg=('serviceWorker' in navigator)?await navigator.serviceWorker.getRegistration().catch(()=>null):null;
+   if(reg&&reg.showNotification){await reg.showNotification(title,{body,icon:'',vibrate:[120,60,120],tag:'jarvis'});return true}
+   new Notification(title,{body,vibrate:[120,60,120]});return true}}catch(e){}
+ toast(title+': '+body,5000);return false}
+function addReminder(min,text){const at=Date.now()+Math.round(min*60000);rems.push({id:Date.now(),at,t:text,done:false});saveR();renderRems();toast('Lembrete em '+(min>=1?Math.round(min)+' min':Math.round(min*60)+' s')+': '+text,3500);askNotif()}
+function renderRems(){const l=$('n-list');if(!l)return;const a=rems.filter(r=>!r.done).sort((x,y)=>x.at-y.at);
+ l.innerHTML=a.length?'':'<p class="note">Nenhum lembrete agendado.</p>';
+ a.forEach(r=>{const d=document.createElement('div');d.className='mem-i';const p=document.createElement('p');const sm=document.createElement('small');sm.textContent=new Date(r.at).toLocaleString('pt-BR',{hour:'2-digit',minute:'2-digit',day:'2-digit',month:'2-digit'});p.append(sm,r.t);const x=document.createElement('button');x.textContent='×';x.onclick=()=>{r.done=true;saveR();renderRems()};d.append(p,x);l.appendChild(d)})}
+setInterval(()=>{const now=Date.now();let ch=false;rems.forEach(r=>{if(!r.done&&r.at<=now){r.done=true;ch=true;notify('Jarvis — lembrete',r.t);if(on&&!busy&&!speaking)speak('Lembrete, '+(S.nome||'senhor')+': '+r.t)}});
+ if(ch){saveR();renderRems()}rems=rems.filter(r=>!r.done||now-r.at<86400000)},2000);
+
+/* ---------- Imagens (Nano Banana 2) ---------- */
+let gal=jget('jgal',[]);
+function renderGal(){const g=$('gal');if(!g)return;g.innerHTML='';gal.slice(0,12).forEach(it=>{const a=document.createElement('a');a.href=it.u;a.download='jarvis-'+it.id+'.png';const im=document.createElement('img');im.src=it.u;im.loading='lazy';a.appendChild(im);g.appendChild(a)})}
+async function genImage(prompt){
+ if(!getK()&&!hasBrain()){toast('Ative o cérebro Superagent ou adicione a chave do Gemini');return}
+ toast('Criando imagem…',60000);
+ const models=[...new Set([lsGet('jimgM',''),S.img,'gemini-3.1-flash-image','gemini-3.1-flash-lite-image','gemini-2.5-flash-image'].filter(Boolean))];
+ let err='';
+ for(const m of models){
+  try{const r=await gSend(m+':generateContent',{contents:[{role:'user',parts:[{text:prompt}]}],generationConfig:{responseModalities:['IMAGE','TEXT']}});
+   if(r.status===429){err=m+' — limite da API, aguarde um pouco';break}
+   if(!r.ok){const d=await r.json().catch(()=>({}));err=m+' '+r.status+' '+((d.error&&d.error.message)||'').slice(0,80);continue}
+   const d=await r.json();const p=((d.candidates||[])[0]?.content?.parts||[]).find(x=>x.inlineData&&/image/.test(x.inlineData.mimeType||''));
+   if(!p){err=m+' sem imagem';continue}
+   const url='data:'+p.inlineData.mimeType+';base64,'+p.inlineData.data;lsSet('jimgM',m);
+   showImage(url,prompt);return}
+  catch(e){err=String(e.message||e)}}
+ toast('Não consegui criar a imagem: '+err,6000)}
+function showImage(url,prompt){
+ const id=Date.now();
+ // guarda miniatura reduzida para não estourar o localStorage
+ const im=new Image();im.onload=()=>{const c=document.createElement('canvas'),w=420,h=Math.round(im.height*w/im.width);c.width=w;c.height=h;c.getContext('2d').drawImage(im,0,0,w,h);
+  gal.unshift({id,u:c.toDataURL('image/jpeg',.7),p:prompt});gal=gal.slice(0,12);
+  try{lsSet('jgal',JSON.stringify(gal))}catch(e){gal=gal.slice(0,4);try{lsSet('jgal',JSON.stringify(gal))}catch(_){}}renderGal()};im.src=url;
+ let o=$('img-out');if(!o){o=document.createElement('div');o.id='img-out';$('v-j').insertBefore(o,$('md'))}
+ o.innerHTML='';const i2=document.createElement('img');i2.src=url;o.appendChild(i2);
+ const r=document.createElement('div');r.className='row2';const a=document.createElement('a');a.className='btn ac';a.href=url;a.download='jarvis-'+id+'.png';a.textContent='Baixar';a.style.textDecoration='none';
+ const x=document.createElement('button');x.className='btn';x.textContent='Fechar';x.onclick=()=>o.remove();r.append(a,x);o.appendChild(r);
+ toast('Imagem pronta!');notify('Jarvis','Sua imagem está pronta.')}
+
+/* ---------- Tela de Configurações ---------- */
+const TABS=[
+ ['geral','Geral','<path d="M4 6h10M18 6h2M4 12h4M12 12h8M4 18h12M20 18h0"/><circle cx="16" cy="6" r="2"/><circle cx="10" cy="12" r="2"/><circle cx="18" cy="18" r="2"/>'],
+ ['voz','Voz','<path d="M11 5L6 9H3v6h3l5 4z"/><path d="M15.5 8.5a5 5 0 0 1 0 7M18.5 5.5a9 9 0 0 1 0 13"/>'],
+ ['mic','Microfone','<rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3"/>'],
+ ['apis','APIs','<circle cx="8" cy="15" r="4"/><path d="M11 12l9-9M16 7l3 3M14 9l2 2"/>'],
+ ['mem','Memória','<path d="M12 4a4 4 0 0 0-4 4 4 4 0 0 0-3 6 4 4 0 0 0 4 5h3z"/><path d="M12 4a4 4 0 0 1 4 4 4 4 0 0 1 3 6 4 4 0 0 1-4 5h-3zM12 4v15"/>'],
+ ['notif','Notificações','<path d="M6 8a6 6 0 0 1 12 0c0 7 3 8 3 8H3s3-1 3-8"/><path d="M10 20a2 2 0 0 0 4 0"/>'],
+ ['img','Imagens','<rect x="3" y="4" width="18" height="16" rx="3"/><circle cx="9" cy="10" r="2"/><path d="M21 16l-5-5-9 9"/>'],
+ ['perf','Otimização','<path d="M13 3L5 14h6l-1 7 8-11h-6z"/>'],
+ ['priv','Privacidade','<path d="M12 3l7 3v5c0 5-3 8-7 10-4-2-7-5-7-10V6z"/>']];
+const tb=$('tabs');
+TABS.forEach(([id,nm,ic])=>{const b=document.createElement('button');b.dataset.t=id;b.innerHTML='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">'+ic+'</svg>'+nm;b.onclick=()=>selTab(id,true);tb.appendChild(b)});
+function selTab(id,scroll){document.querySelectorAll('#tabs button').forEach(b=>{const a=b.dataset.t===id;b.classList.toggle('a',a);if(a&&scroll)b.scrollIntoView({inline:'center',block:'nearest',behavior:'smooth'})});
+ document.querySelectorAll('.sec').forEach(s=>s.classList.toggle('a',s.dataset.t===id));$('cfg-b').scrollTop=0;lsSet('jtab',id);
+ if(id==='mem')renderMem();if(id==='notif'){notifStatus();renderRems()}if(id==='img')renderGal();if(id==='apis')loadKeys()}
+function updBar(){const s=tb.scrollLeft,m=tb.scrollWidth-tb.clientWidth,w=Math.max(18,tb.clientWidth/tb.scrollWidth*100),i=document.querySelector('#tbar i');i.style.width=w+'%';i.style.left=(m>0?s/m*(100-w):0)+'%'}
+tb.addEventListener('scroll',updBar,{passive:true});
+function openCfg(id){$('cfg').classList.add('show');selTab(id||lsGet('jtab','geral'),true);loadAll();setTimeout(updBar,50)}
+function closeCfg(){$('cfg').classList.remove('show')}
+$('gear').onclick=()=>openCfg();$('cfg-x').onclick=closeCfg;
+
+/* vincula campos <-> S */
+const VOZES=[['Charon','grave'],['Algieba','suave'],['Achird','amigável'],['Zubenelgenubi','casual'],['Umbriel','tranquilo'],['Sadaltager','culto'],['Rasalgethi','informativo'],['Schedar','uniforme'],['Fenrir','animado'],['Orus','firme'],['Puck','expressivo'],['Algenib','rouco'],['Alnilam','firme'],['Iapetus','claro'],['Enceladus','sussurrado'],['Kore','firme'],['Zephyr','brilhante'],['Aoede','leve'],['Leda','jovem'],['Gacrux','maduro'],['Sulafat','caloroso'],['Vindemiatrix','gentil']];
+[$('s-voz'),$('vs')].forEach(sel=>{sel.innerHTML='';VOZES.forEach(([v,d])=>{const o=document.createElement('option');o.value=v;o.textContent=v+' · '+d;sel.appendChild(o)});const o=document.createElement('option');o.value='device';o.textContent='Voz do celular';sel.appendChild(o)});
+const BIND=[['s-greet','greet','b'],['s-brain','brain','t'],['s-nome','nome','t'],['s-auto','auto','b'],['s-deep','deep','b'],['s-pers','pers','t'],['s-voz','voz','t'],['s-estilo','estilo','t'],['s-tts','tts','t'],['s-fb','fb','b'],['s-sens','sens','n'],['s-sil','sil','n'],['s-eco','eco','b'],['s-mem','mem','b'],['s-lem','lem','b'],['s-img','img','t'],['s-fast','fast','b'],['s-strm','strm','b'],['s-warm','warm','b'],['s-hist','hist','n'],['s-web','web','b'],['s-sh','sh','b']];
+function loadAll(){BIND.forEach(([id,k,ty])=>{const el=$(id);if(ty==='b')el.checked=!!S[k];else el.value=S[k]});$('vs').value=S.voz;pm()}
+BIND.forEach(([id,k,ty])=>{const el=$(id);el.addEventListener(ty==='b'||el.tagName==='SELECT'?'change':'input',()=>{S[k]=ty==='b'?el.checked:ty==='n'?(parseFloat(el.value)||DEF[k]):el.value;saveS();
+ if(k==='voz')$('vs').value=S.voz;if(k==='deep')pm();if(k==='fast'&&S.fast&&S.deep){}
+ if(k==='sh'&&!S.sh){try{localStorage.removeItem('jh')}catch(e){}}if(k==='voz'||k==='estilo'||k==='tts')ttsCache.clear()})});
+$('vs').onchange=()=>{S.voz=$('vs').value;saveS();ttsCache.clear();$('s-voz').value=S.voz};
+/* chaves */
+function loadKeys(){$('k-g').value=getK();$('k-t').value=lsGet('jkt','');$('k-q').value=getG()}
+[['k-g','jk'],['k-t','jkt'],['k-q','jg']].forEach(([id,k])=>$(id).addEventListener('input',()=>{const v=$(id).value.trim();if(v)lsSet(k,v);else try{localStorage.removeItem(k)}catch(e){}ttsCache.clear()}));
+$('b-tk').onclick=async()=>{const d=$('key-diag');d.textContent='Testando…';const out=[];
+ if(hasBrain()){try{const r=await fetch(BRAIN,{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({pc:PASS,path:'ping'})});const j=await r.json().catch(()=>({}));out.push('Cérebro Superagent: '+(j.ok&&j.key?'OK ✓ — chave ativa no servidor':(j.ok?'responde, mas sem chave no servidor':'falhou ('+(j.error||r.status)+')')))}catch(e){out.push('Cérebro Superagent: sem rede — '+String(e.message||e).slice(0,60))}}
+ if(getK()){try{const r=await fetch(GU+'gemini-3.5-flash-lite',{headers:{'x-goog-api-key':getK()}});out.push('Gemini: '+(r.ok?'OK ✓':'erro '+r.status))}catch(e){out.push('Gemini: sem rede')}}else out.push('Gemini: sem chave');
+ if(useG()){const b=await ttsBuf('Teste.');out.push('Voz (TTS): '+(b?'OK ✓':'falhou — '+ttsErr))}else out.push('Voz: voz do celular');
+ if(getG()&&!hasBrain()){try{const r=await fetch(GQ+'models',{headers:{Authorization:'Bearer '+getG()}});out.push('Groq: '+(r.ok?'OK ✓':'erro '+r.status))}catch(e){out.push('Groq: sem rede')}}else out.push('Groq: sem chave (opcional)');
+ d.innerHTML=out.join('<br>')};
+/* voz: teste */
+$('b-tv').onclick=async()=>{if(!ac){try{ac=new(window.AudioContext||window.webkitAudioContext)()}catch(e){}}try{await ac.resume()}catch(e){}
+ const d=$('tts-diag');d.textContent='Gerando voz…';const t0=performance.now();
+ if(!getT()){d.textContent='Adicione uma chave Gemini em APIs.';await dspeak('Teste de voz do celular.');return}
+ const b=await ttsBuf('Olá, '+(S.nome||'senhor')+'. Sistemas online e funcionando perfeitamente.');
+ if(b){d.textContent='Voz OK — gerada em '+Math.round(performance.now()-t0)+' ms.';await playBuf(b)}
+ else{d.textContent='Falha na voz do Gemini: '+ttsErr+(S.fb?' (usando voz do celular)':'');if(S.fb)await dspeak('Voz do celular. A voz do Gemini falhou.')}};
+/* memória */
+function renderMem(){const l=$('m-list');l.innerHTML=facts.length?'':'<p class="note">Ainda sem memórias. Peça "lembra que…" ou adicione acima.</p>';
+ facts.forEach(f=>{const d=document.createElement('div');d.className='mem-i';const p=document.createElement('p');const sm=document.createElement('small');sm.textContent=new Date(f.d).toLocaleDateString('pt-BR');p.append(sm,f.t);const x=document.createElement('button');x.textContent='×';x.onclick=()=>{facts=facts.filter(z=>z.id!==f.id);saveF();renderMem()};d.append(p,x);l.appendChild(d)})}
+$('m-add').onclick=()=>{const v=$('m-new').value;if(v.trim()){addFact(v);$('m-new').value='';renderMem()}};
+$('m-new').addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();$('m-add').click()}});
+$('m-clr').onclick=()=>{if(confirm('Apagar todas as memórias de longo prazo?')){facts=[];saveF();renderMem()}};
+$('m-exp').onclick=()=>{const b=new Blob([JSON.stringify({facts,hist,tarefas:td},null,1)],{type:'application/json'}),a=document.createElement('a');a.href=URL.createObjectURL(b);a.download='jarvis-memoria.json';a.click()};
+/* notificações */
+$('n-perm').onclick=async()=>{const ok=await askNotif();toast(ok?'Notificações ativadas':'Permissão não concedida')};
+$('n-test').onclick=async()=>{if(await askNotif())notify('Jarvis','Notificação de teste funcionando, '+(S.nome||'senhor')+'.');else toast('Permita as notificações primeiro')};
+/* imagens */
+$('i-go').onclick=()=>{const p=$('i-p').value.trim();if(!p)return;closeCfg();genImage(p)};
+/* privacidade */
+$('p-hist').onclick=()=>{if(confirm('Apagar o histórico de conversa?')){hist=[];try{localStorage.removeItem('jh')}catch(e){}toast('Histórico apagado')}};
+$('p-all').onclick=()=>{if(confirm('Apagar TUDO (chaves, memória, tarefas, configurações)?')){try{localStorage.clear()}catch(e){}location.reload()}};
+
+/* ---------- UI original (preservada) ---------- */
+$('row').onsubmit=e=>{e.preventDefault();const t=$('q').value;$('q').value='';if(!busy)handle({text:t})};
+$('core').onclick=()=>{if(locked)return;if(busy&&on){if(abortCtl)try{abortCtl.abort()}catch(e){}stopAudio();return}on?stop():start()};
+document.addEventListener('pointerdown',()=>{try{ac&&ac.resume()}catch(e){}},{passive:true});
+const cv=$('cv'),cx=cv.getContext('2d');let W=0,amp=0,ang=0;const pts=[];
+for(let i=0;i<700;i++){const y=1-2*(i+.5)/700,r=Math.sqrt(1-y*y),a=i*2.39996;pts.push([Math.cos(a)*r,y,Math.sin(a)*r,Math.random()])}
+function sz(){const r=cv.getBoundingClientRect(),d=devicePixelRatio||1;W=r.width;cv.width=W*d;cv.height=W*d;cx.setTransform(d,0,0,d,0,0)}
+addEventListener('resize',sz);sz();
+function draw(ts){
+ const tgt=B.classList.contains('talk')?1:B.classList.contains('listen')?.55:B.classList.contains('on')?.12:0;
+ amp+=(tgt-amp)*.08;ang+=.003+amp*.012;
+ const R=W*.43*(1+amp*.05*Math.sin(ts/130)),ca=Math.cos(ang),sa=Math.sin(ang);
+ cx.clearRect(0,0,W,W);
+ for(const p of pts){const x=p[0]*ca+p[2]*sa,z=-p[0]*sa+p[2]*ca,j=1+amp*.1*Math.sin(ts/190+p[3]*30),d=(z+1)/2;
+  cx.fillStyle='rgba('+(215-amp*50|0)+','+(215-amp*45|0)+',240,'+(.18+.62*d)+')';
+  cx.beginPath();cx.arc(W/2+x*R*j,W/2+p[1]*R*j,(.7+1.7*d)*(1+p[3]*.6),0,6.3);cx.fill()}
+ requestAnimationFrame(draw)}
+requestAnimationFrame(draw);
+function pm(){const b=$('md');b.textContent=S.deep?'Modo profundo · pensa mais':'Modo rápido';b.classList.toggle('deep',!!S.deep)}
+$('md').onclick=()=>{S.deep=!S.deep;if(S.deep)S.fast=false;else S.fast=true;saveS();pm()};pm();
+function tab(n){['j','h','m'].forEach(k=>{$('v-'+k).hidden=k!==n;$('t-'+k).classList.toggle('a',k===n)});if(n==='m')mem();if(n==='h')todos()}
+['j','h','m'].forEach(k=>$('t-'+k).onclick=()=>tab(k));$('hist').onclick=()=>tab('m');
+$('esc').onclick=()=>{$('row').classList.toggle('show');if($('row').classList.contains('show'))$('q').focus()};
+/* aba Memória da barra inferior: conversa + fatos */
+function mem(){const l=$('ml');l.innerHTML='';
+ if(facts.length){const h=document.createElement('div');h.className='mi';const s=document.createElement('small');s.textContent='O QUE EU SEI SOBRE VOCÊ';h.appendChild(s);facts.slice(0,30).forEach(f=>{const p=document.createElement('p');p.textContent='• '+f.t;h.appendChild(p)});l.appendChild(h)}
+ if(!hist.length&&!facts.length){l.innerHTML='<p class="e">Ainda sem memórias.</p>';return}
+ hist.slice().reverse().slice(0,40).forEach(m=>{const d=document.createElement('div');d.className='mi';const b=document.createElement('small');b.textContent=m.role==='user'?'VOCÊ':'JARVIS';const p=document.createElement('p');p.textContent=m.content;d.append(b,p);l.appendChild(d)})}
+$('zr').onclick=()=>{if(confirm('Apagar a conversa? (os fatos de longo prazo ficam; apague em Configurações > Memória)')){hist=[];try{localStorage.removeItem('jh')}catch(e){}$('u').textContent='—';$('j').textContent='Conversa apagada, '+(S.nome||'senhor')+'.';mem()}};
+let td=jget('jt',[]);
+function todos(){const l=$('tl');l.innerHTML='';td.forEach((t,i)=>{const d=document.createElement('label');d.className='ti'+(t.d?' d':'');const c=document.createElement('input');c.type='checkbox';c.checked=t.d;c.onchange=()=>{t.d=c.checked;sv();todos()};const sp=document.createElement('span');sp.textContent=t.t;const x=document.createElement('button');x.type='button';x.textContent='×';x.onclick=e=>{e.preventDefault();td.splice(i,1);sv();todos()};d.append(c,sp,x);l.appendChild(d)});
+ const n=td.filter(t=>!t.d).length,bd=$('bd');bd.textContent=n;bd.hidden=!n}
+function sv(){lsSet('jt',JSON.stringify(td))}
+$('tf').onsubmit=e=>{e.preventDefault();const v=$('tq').value.trim();if(v){td.push({t:v,d:false});$('tq').value='';sv();todos()}};
+todos();loadAll();renderRems();renderGal();
+/* service worker (notificações + instalar na tela inicial) */
+if('serviceWorker' in navigator&&location.protocol==='https:')navigator.serviceWorker.register('sw.js').catch(()=>{})
+/* ---------- Instalar como app (PWA) ---------- */
+let dp=null;
+addEventListener('beforeinstallprompt',e=>{e.preventDefault();dp=e;instUI()});
+addEventListener('appinstalled',()=>{dp=null;$('instb').hidden=true;$('b-inst').textContent='Instalado ✓';$('inst-st').textContent='Jarvis instalado na tela inicial';toast('Jarvis instalado, '+(S.nome||'senhor')+'!')});
+const standalone=()=>matchMedia('(display-mode: standalone)').matches;
+function instUI(){
+ if(standalone()){$('instb').hidden=true;$('b-inst').textContent='Instalado ✓';return}
+ $('b-inst').textContent=dp?'Instalar':'Como instalar';
+ $('instb').hidden=lsGet('jinst','')==='2';
+ if(lsGet('jinst','')!=='2')setTimeout(()=>{if(!standalone())$('instb').hidden=false},6000)}
+function openInstall(){
+ if(dp){dp.prompt();dp.userChoice.then(()=>{dp=null;instUI()});return}
+ const site=location.protocol==='https:';
+ $('ovl-p').innerHTML=site?
+  'Toque no botão verde <b class="k">Instalar app</b> que aparece no meio da tela em alguns segundos. Ele abre a instalação nativa do Chrome.<br><br>'+
+  'Se preferir: menu <b class="k">⋮</b> (três pontinhos) na barra do Chrome → <b class="k">Instalar aplicativo</b> ou <b class="k">Adicionar à tela inicial</b>.':
+  ('Para instalar na tela inicial:<br><br>'+
+  '1. Abra o Jarvis no Chrome. Se baixou o arquivo: app <b class="k">Arquivos</b> → toque no arquivo do Jarvis → <b class="k">Abrir com Chrome</b>.<br>'+
+  '2. Toque no menu <b class="k">⋮</b> (três pontinhos) na barra do Chrome.<br>'+
+  '3. Toque em <b class="k">Adicionar à tela inicial</b> ou <b class="k">Instalar aplicativo</b>.<br>'+
+  '4. Confirme. O ícone aparece como um app comum.'+
+  '<br><br>O atalho reabre o arquivo. Deixe-o na pasta <b class="k">Download</b> e não mova nem apague.');
+ $('ovl-ok').hidden=!dp;
+ $('ovl').classList.add('show')}
+$('b-inst').onclick=openInstall;$('instb').onclick=openInstall;
+$('ovl-x').onclick=()=>{$('ovl').classList.remove('show');lsSet('jinst','2')};
+$('ovl-ok').onclick=()=>{$('ovl').classList.remove('show')};
+instUI();
+if(S.auto)setTimeout(()=>{if(!on)start()},400);
+
+</script></body></html>
