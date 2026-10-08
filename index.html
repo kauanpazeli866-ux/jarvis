@@ -208,8 +208,9 @@ const $=id=>document.getElementById(id),st=$('status'),B=document.body;
    notificações e imagens (Nano Banana). Tudo em localStorage.
    ===================================================================== */
 const DEF={brain:'super',greet:true,nome:'senhor',auto:true,deep:false,pers:'',voz:'Charon',estilo:'calmo, grave e confiante',tts:'gemini-3.8-flash-lite-tts',fb:true,
- sens:3,sil:380,eco:true,mem:true,lem:true,img:'gemini-3.1-flash-image',fast:true,strm:true,warm:true,hist:10,web:true,sh:true};
+ sens:3,sil:250,eco:true,mem:true,lem:true,img:'gemini-3.1-flash-image',fast:true,strm:true,warm:true,hist:6,web:true,sh:true};
 let S={};try{S=Object.assign({},DEF,JSON.parse(localStorage.getItem('jcfg')||'{}'))}catch(e){S=Object.assign({},DEF)}
+if(S.cfgv!==2){S.sil=Math.min(S.sil||DEF.sil,DEF.sil);S.hist=Math.min(S.hist||DEF.hist,DEF.hist);S.fast=true;S.strm=true;S.warm=true;S.cfgv=2;try{localStorage.setItem('jcfg',JSON.stringify(S))}catch(e){}}
 function saveS(){try{localStorage.setItem('jcfg',JSON.stringify(S))}catch(e){}}
 function toast(t,ms){const x=$('toast');x.textContent=t;x.classList.add('show');clearTimeout(toast._t);toast._t=setTimeout(()=>x.classList.remove('show'),ms||2600)}
 const lsGet=(k,d)=>{try{const v=localStorage.getItem(k);return v==null?d:v}catch(e){return d}};
@@ -257,7 +258,7 @@ const SR=window.SpeechRecognition||window.webkitSpeechRecognition;
 /* ---------- Voz do aparelho (reserva) ---------- */
 let voice=null;
 function pick(){if(!('speechSynthesis' in window))return;const v=speechSynthesis.getVoices().filter(x=>/pt[-_]/i.test(x.lang));
- const rank=x=>{const n=x.name.toLowerCase();let p=0;if(/natural|online|neural/.test(n))p+=4;if(/antonio|daniel|felipe|ricardo|google/.test(n))p+=3;if(/luciana|maria|francisca|fernanda|female|fem/.test(n))p-=5;return p};
+ const rank=x=>{const n=x.name.toLowerCase();let p=0;if(/natural|online|neural/.test(n))p+=3;if(/antonio|daniel|felipe|ricardo|duarte|julio|male/.test(n))p+=6;if(/luciana|maria|francisca|fernanda|helena|female|fem|mulher|google/.test(n))p-=8;return p};
  voice=v.sort((a,b)=>rank(b)-rank(a))[0]||null}
 if('speechSynthesis' in window){pick();speechSynthesis.onvoiceschanged=pick}
 const SM={'OUVINDO':'Ouvindo…','PROCESSANDO':'Pensando…','FALANDO':'Falando…','ATIVANDO…':'Ligando…','TOQUE NO NÚCLEO PARA ATIVAR':'Toque para falar.','ATIVO':'Ouvindo…'};
@@ -635,7 +636,7 @@ $('p-all').onclick=()=>{if(confirm('Apagar TUDO (chaves, memória, tarefas, conf
 
 /* ---------- UI original (preservada) ---------- */
 $('row').onsubmit=e=>{e.preventDefault();const t=$('q').value;$('q').value='';if(!busy)handle({text:t})};
-$('core').onclick=()=>{if(locked)return;if(busy&&on){if(abortCtl)try{abortCtl.abort()}catch(e){}stopAudio();return}on?stop():start()};
+$('core').onclick=()=>{if(locked)return;if(busy||speaking){if(abortCtl)try{abortCtl.abort()}catch(e){}stopAudio();return}on?stop():start()};
 document.addEventListener('pointerdown',()=>{try{ac&&ac.resume()}catch(e){}},{passive:true});
 const cv=$('cv'),cx=cv.getContext('2d');let W=0,amp=0,ang=0;const pts=[];
 for(let i=0;i<700;i++){const y=1-2*(i+.5)/700,r=Math.sqrt(1-y*y),a=i*2.39996;pts.push([Math.cos(a)*r,y,Math.sin(a)*r,Math.random()])}
